@@ -20,6 +20,7 @@ export const APP_ROUTES = {
     AFFILIATES: '/affiliates',
     AFFILIATE_DETAIL: (id: string) => `/affiliates/${id}` as const,
     COUPONS: '/coupons',
+    COUPON_DETAIL: (id: string) => `/coupons/${id}` as const,
   },
   EXTERNAL: {
     LANDING: 'https://justifica.ai',

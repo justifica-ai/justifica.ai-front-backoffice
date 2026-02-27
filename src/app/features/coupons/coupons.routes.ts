@@ -8,4 +8,11 @@ export const couponsRoutes: Routes = [
         (m) => m.CouponsPageComponent,
       ),
   },
+  {
+    path: ':id',
+    loadComponent: () =>
+      import('./pages/coupon-detail-page/coupon-detail-page.component').then(
+        (m) => m.CouponDetailPageComponent,
+      ),
+  },
 ];
