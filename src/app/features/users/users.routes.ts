@@ -8,4 +8,11 @@ export const usersRoutes: Routes = [
         (m) => m.UsersListPageComponent,
       ),
   },
+  {
+    path: ':id',
+    loadComponent: () =>
+      import('./pages/user-detail-page/user-detail-page.component').then(
+        (m) => m.UserDetailPageComponent,
+      ),
+  },
 ];
