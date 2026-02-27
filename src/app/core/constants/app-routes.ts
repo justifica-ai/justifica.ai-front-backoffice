@@ -18,6 +18,7 @@ export const APP_ROUTES = {
     AUDIT_LOG_DETAIL: (id: string) => `/audit-logs/${id}` as const,
     AI: '/ai',
     AFFILIATES: '/affiliates',
+    AFFILIATE_DETAIL: (id: string) => `/affiliates/${id}` as const,
     COUPONS: '/coupons',
   },
   EXTERNAL: {

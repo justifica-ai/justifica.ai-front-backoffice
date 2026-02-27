@@ -42,7 +42,9 @@ export const API_ROUTES = {
   AFFILIATES: {
     BASE: '/admin/affiliates',
     BY_ID: (id: string) => `/admin/affiliates/${id}` as const,
-    WITHDRAWALS: '/admin/affiliates/withdrawals',
+    PENDING_WITHDRAWALS: '/admin/affiliates/withdrawals/pending',
+    PROCESS_WITHDRAWAL: (affiliateId: string, withdrawalId: string) =>
+      `/admin/affiliates/${affiliateId}/withdrawals/${withdrawalId}` as const,
   },
   COUPONS: {
     BASE: '/admin/coupons',

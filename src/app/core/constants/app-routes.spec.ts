@@ -12,4 +12,12 @@ describe('APP_ROUTES', () => {
   it('should have dynamic user detail route', () => {
     expect(APP_ROUTES.ADMIN.USER_DETAIL('abc')).toBe('/users/abc');
   });
+
+  it('should have affiliates route', () => {
+    expect(APP_ROUTES.ADMIN.AFFILIATES).toBe('/affiliates');
+  });
+
+  it('should have dynamic affiliate detail route', () => {
+    expect(APP_ROUTES.ADMIN.AFFILIATE_DETAIL('abc-123')).toBe('/affiliates/abc-123');
+  });
 });
