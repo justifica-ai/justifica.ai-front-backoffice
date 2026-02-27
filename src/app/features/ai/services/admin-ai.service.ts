@@ -35,6 +35,12 @@ import type {
   AdminAiPromptCloneResponse,
   AdminAiPromptDiffResponse,
   AdminAiPromptDeleteResponse,
+  PlaygroundExecuteBody,
+  PlaygroundExecuteResponse,
+  PlaygroundCompareBody,
+  PlaygroundCompareResponse,
+  PlaygroundTestDataResponse,
+  PromptType,
 } from '../models/ai.model';
 
 @Injectable({ providedIn: 'root' })
@@ -43,6 +49,7 @@ export class AdminAiService {
   private readonly providersUrl = `${environment.apiUrl}/api/admin/ai/providers`;
   private readonly modelsUrl = `${environment.apiUrl}/api/admin/ai/models`;
   private readonly promptsUrl = `${environment.apiUrl}/api/admin/ai/prompts`;
+  private readonly playgroundUrl = `${environment.apiUrl}/api/admin/ai/playground`;
 
   // ═══════ Providers ═══════
 
@@ -161,5 +168,19 @@ export class AdminAiService {
 
   deletePrompt(id: string): Observable<AdminAiPromptDeleteResponse> {
     return this.http.delete<AdminAiPromptDeleteResponse>(`${this.promptsUrl}/${id}`);
+  }
+
+  // ═══════ Playground ═══════
+
+  executePlayground(body: PlaygroundExecuteBody): Observable<PlaygroundExecuteResponse> {
+    return this.http.post<PlaygroundExecuteResponse>(`${this.playgroundUrl}/execute`, body);
+  }
+
+  comparePlayground(body: PlaygroundCompareBody): Observable<PlaygroundCompareResponse> {
+    return this.http.post<PlaygroundCompareResponse>(`${this.playgroundUrl}/compare`, body);
+  }
+
+  getTestData(promptType: PromptType): Observable<PlaygroundTestDataResponse> {
+    return this.http.get<PlaygroundTestDataResponse>(`${this.playgroundUrl}/test-data/${promptType}`);
   }
 }

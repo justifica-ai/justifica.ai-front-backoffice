@@ -11,6 +11,7 @@ describe('AdminAiService', () => {
   const providersUrl = `${environment.apiUrl}/api/admin/ai/providers`;
   const modelsUrl = `${environment.apiUrl}/api/admin/ai/models`;
   const promptsUrl = `${environment.apiUrl}/api/admin/ai/prompts`;
+  const playgroundUrl = `${environment.apiUrl}/api/admin/ai/playground`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -354,6 +355,42 @@ describe('AdminAiService', () => {
       const req = httpTesting.expectOne(`${promptsUrl}/${id}`);
       expect(req.request.method).toBe('DELETE');
       req.flush({ success: true, id });
+    });
+  });
+
+  // ═══════ Playground ═══════
+
+  describe('executePlayground', () => {
+    it('should execute playground generation', () => {
+      const body = { promptId: 'p1', modelId: 'm1', testData: { nome: 'Test' } };
+      service.executePlayground(body).subscribe();
+      const req = httpTesting.expectOne(`${playgroundUrl}/execute`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(body);
+      req.flush({ content: 'result', renderedSystemPrompt: 'sys', renderedUserPrompt: 'usr', metrics: {} });
+    });
+  });
+
+  describe('comparePlayground', () => {
+    it('should execute playground comparison', () => {
+      const body = {
+        configA: { promptId: 'p1', modelId: 'm1', testData: { nome: 'A' } },
+        configB: { promptId: 'p2', modelId: 'm2', testData: { nome: 'B' } },
+      };
+      service.comparePlayground(body).subscribe();
+      const req = httpTesting.expectOne(`${playgroundUrl}/compare`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(body);
+      req.flush({ resultA: {}, resultB: {} });
+    });
+  });
+
+  describe('getTestData', () => {
+    it('should get test data for prompt type', () => {
+      service.getTestData('defesa_previa').subscribe();
+      const req = httpTesting.expectOne(`${playgroundUrl}/test-data/defesa_previa`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ promptType: 'defesa_previa', placeholders: { nome: 'Test' } });
     });
   });
 });

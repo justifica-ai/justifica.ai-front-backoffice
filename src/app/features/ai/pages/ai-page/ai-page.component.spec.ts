@@ -51,6 +51,13 @@ describe('AiPageComponent', () => {
     req.flush({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
   }
 
+  function flushPlaygroundInit(): void {
+    const promptReq = httpTesting.expectOne((r) => r.url === promptsUrl);
+    promptReq.flush({ data: [], pagination: { page: 1, limit: 100, total: 0, totalPages: 0 } });
+    const modelReq = httpTesting.expectOne((r) => r.url === modelsUrl);
+    modelReq.flush({ data: [], pagination: { page: 1, limit: 100, total: 0, totalPages: 0 } });
+  }
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -111,10 +118,11 @@ describe('AiPageComponent', () => {
 
     const el = fixture.nativeElement as HTMLElement;
     const buttons = el.querySelectorAll('nav button');
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(4);
     expect(buttons[0].textContent).toContain('Provedores');
     expect(buttons[1].textContent).toContain('Modelos');
     expect(buttons[2].textContent).toContain('Prompts');
+    expect(buttons[3].textContent).toContain('Playground');
   });
 
   it('should switch to prompts tab', () => {
@@ -145,5 +153,20 @@ describe('AiPageComponent', () => {
 
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('app-ai-providers-page')).toBeTruthy();
+  });
+
+  it('should switch to playground tab', () => {
+    fixture.detectChanges();
+    flushProvidersList();
+
+    component.activeTab.set('playground');
+    fixture.detectChanges();
+    flushPlaygroundInit();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('app-ai-playground-page')).toBeTruthy();
+    expect(el.querySelector('app-ai-providers-page')).toBeFalsy();
+    expect(el.querySelector('app-ai-models-page')).toBeFalsy();
+    expect(el.querySelector('app-ai-prompts-page')).toBeFalsy();
   });
 });

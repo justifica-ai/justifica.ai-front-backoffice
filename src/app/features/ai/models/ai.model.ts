@@ -372,3 +372,47 @@ export const PROMPT_STATUS_COLORS: Record<PromptStatus, string> = {
   inactive: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
   archived: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 };
+
+// ═══════ Playground ═══════
+
+export interface PlaygroundExecutionMetrics {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  durationMs: number;
+  estimatedCost: number;
+  modelName: string;
+  modelSlug: string;
+  providerName: string;
+  providerSlug: string;
+  promptName: string;
+  promptVersion: string;
+}
+
+export interface PlaygroundExecuteBody {
+  promptId: string;
+  modelId: string;
+  testData: Record<string, string>;
+}
+
+export interface PlaygroundExecuteResponse {
+  content: string;
+  renderedSystemPrompt: string;
+  renderedUserPrompt: string;
+  metrics: PlaygroundExecutionMetrics;
+}
+
+export interface PlaygroundCompareBody {
+  configA: PlaygroundExecuteBody;
+  configB: PlaygroundExecuteBody;
+}
+
+export interface PlaygroundCompareResponse {
+  resultA: PlaygroundExecuteResponse;
+  resultB: PlaygroundExecuteResponse;
+}
+
+export interface PlaygroundTestDataResponse {
+  promptType: PromptType;
+  placeholders: Record<string, string>;
+}
