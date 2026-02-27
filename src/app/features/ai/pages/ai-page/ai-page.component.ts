@@ -3,13 +3,14 @@ import { AiProvidersPageComponent } from '../ai-providers-page/ai-providers-page
 import { AiModelsPageComponent } from '../ai-models-page/ai-models-page.component';
 import { AiPromptsPageComponent } from '../ai-prompts-page/ai-prompts-page.component';
 import { AiPlaygroundPageComponent } from '../ai-playground-page/ai-playground-page.component';
+import { AiMetricsPageComponent } from '../ai-metrics-page/ai-metrics-page.component';
 
-type AiTab = 'providers' | 'models' | 'prompts' | 'playground';
+type AiTab = 'providers' | 'models' | 'prompts' | 'playground' | 'metrics';
 
 @Component({
   selector: 'app-ai-page',
   standalone: true,
-  imports: [AiProvidersPageComponent, AiModelsPageComponent, AiPromptsPageComponent, AiPlaygroundPageComponent],
+  imports: [AiProvidersPageComponent, AiModelsPageComponent, AiPromptsPageComponent, AiPlaygroundPageComponent, AiMetricsPageComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Inteligência Artificial</h1>
@@ -61,6 +62,17 @@ type AiTab = 'providers' | 'models' | 'prompts' | 'playground';
         >
           Playground
         </button>
+        <button
+          type="button"
+          (click)="activeTab.set('metrics')"
+          [class]="activeTab() === 'metrics'
+            ? 'pb-3 px-1 text-sm font-medium border-b-2 border-brand-600 text-brand-600 dark:text-brand-400 dark:border-brand-400'
+            : 'pb-3 px-1 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+          [attr.aria-selected]="activeTab() === 'metrics'"
+          role="tab"
+        >
+          Métricas
+        </button>
       </nav>
     </div>
 
@@ -77,6 +89,9 @@ type AiTab = 'providers' | 'models' | 'prompts' | 'playground';
       }
       @case ('playground') {
         <app-ai-playground-page />
+      }
+      @case ('metrics') {
+        <app-ai-metrics-page />
       }
     }
   `,

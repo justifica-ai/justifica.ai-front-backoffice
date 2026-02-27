@@ -12,6 +12,7 @@ describe('AdminAiService', () => {
   const modelsUrl = `${environment.apiUrl}/api/admin/ai/models`;
   const promptsUrl = `${environment.apiUrl}/api/admin/ai/prompts`;
   const playgroundUrl = `${environment.apiUrl}/api/admin/ai/playground`;
+  const metricsUrl = `${environment.apiUrl}/api/admin/ai/metrics`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -391,6 +392,37 @@ describe('AdminAiService', () => {
       const req = httpTesting.expectOne(`${playgroundUrl}/test-data/defesa_previa`);
       expect(req.request.method).toBe('GET');
       req.flush({ promptType: 'defesa_previa', placeholders: { nome: 'Test' } });
+    });
+  });
+
+  // ═══════ Metrics ═══════
+
+  describe('getMetrics', () => {
+    it('should get metrics with default period', () => {
+      service.getMetrics().subscribe();
+      const req = httpTesting.expectOne(
+        (r) => r.url === metricsUrl && r.params.get('period') === '30d',
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush({ period: '30d', summary: {}, byModel: [], byPrompt: [], dailyTrend: [], topErrors: [] });
+    });
+
+    it('should get metrics with custom period', () => {
+      service.getMetrics('7d').subscribe();
+      const req = httpTesting.expectOne(
+        (r) => r.url === metricsUrl && r.params.get('period') === '7d',
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush({ period: '7d', summary: {}, byModel: [], byPrompt: [], dailyTrend: [], topErrors: [] });
+    });
+
+    it('should get metrics with 90d period', () => {
+      service.getMetrics('90d').subscribe();
+      const req = httpTesting.expectOne(
+        (r) => r.url === metricsUrl && r.params.get('period') === '90d',
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush({ period: '90d', summary: {}, byModel: [], byPrompt: [], dailyTrend: [], topErrors: [] });
     });
   });
 });

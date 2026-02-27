@@ -8,6 +8,7 @@ import { environment } from '../../../../../environments/environment';
 const providersUrl = `${environment.apiUrl}/api/admin/ai/providers`;
 const modelsUrl = `${environment.apiUrl}/api/admin/ai/models`;
 const promptsUrl = `${environment.apiUrl}/api/admin/ai/prompts`;
+const metricsUrl = `${environment.apiUrl}/api/admin/ai/metrics`;
 
 describe('AiPageComponent', () => {
   let component: AiPageComponent;
@@ -56,6 +57,15 @@ describe('AiPageComponent', () => {
     promptReq.flush({ data: [], pagination: { page: 1, limit: 100, total: 0, totalPages: 0 } });
     const modelReq = httpTesting.expectOne((r) => r.url === modelsUrl);
     modelReq.flush({ data: [], pagination: { page: 1, limit: 100, total: 0, totalPages: 0 } });
+  }
+
+  function flushMetricsInit(): void {
+    const req = httpTesting.expectOne((r) => r.url === metricsUrl);
+    req.flush({
+      period: '30d', startDate: '', endDate: '',
+      summary: { totalGenerations: 0, totalCost: 0, avgCostPerDoc: 0, totalInputTokens: 0, totalOutputTokens: 0, durationP50Ms: 0, durationP95Ms: 0, fallbackRate: 0, errorRate: 0, successCount: 0, errorCount: 0 },
+      byModel: [], byPrompt: [], dailyTrend: [], topErrors: [],
+    });
   }
 
   it('should create', () => {
@@ -118,11 +128,12 @@ describe('AiPageComponent', () => {
 
     const el = fixture.nativeElement as HTMLElement;
     const buttons = el.querySelectorAll('nav button');
-    expect(buttons.length).toBe(4);
+    expect(buttons.length).toBe(5);
     expect(buttons[0].textContent).toContain('Provedores');
     expect(buttons[1].textContent).toContain('Modelos');
     expect(buttons[2].textContent).toContain('Prompts');
     expect(buttons[3].textContent).toContain('Playground');
+    expect(buttons[4].textContent).toContain('Métricas');
   });
 
   it('should switch to prompts tab', () => {
@@ -168,5 +179,21 @@ describe('AiPageComponent', () => {
     expect(el.querySelector('app-ai-providers-page')).toBeFalsy();
     expect(el.querySelector('app-ai-models-page')).toBeFalsy();
     expect(el.querySelector('app-ai-prompts-page')).toBeFalsy();
+  });
+
+  it('should switch to metrics tab', () => {
+    fixture.detectChanges();
+    flushProvidersList();
+
+    component.activeTab.set('metrics');
+    fixture.detectChanges();
+    flushMetricsInit();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('app-ai-metrics-page')).toBeTruthy();
+    expect(el.querySelector('app-ai-providers-page')).toBeFalsy();
+    expect(el.querySelector('app-ai-models-page')).toBeFalsy();
+    expect(el.querySelector('app-ai-prompts-page')).toBeFalsy();
+    expect(el.querySelector('app-ai-playground-page')).toBeFalsy();
   });
 });

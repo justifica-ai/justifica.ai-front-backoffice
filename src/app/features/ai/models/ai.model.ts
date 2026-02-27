@@ -416,3 +416,66 @@ export interface PlaygroundTestDataResponse {
   promptType: PromptType;
   placeholders: Record<string, string>;
 }
+
+// ═══════ Metrics Dashboard ═══════
+
+export type MetricsPeriod = '7d' | '30d' | '90d';
+
+export interface AiMetricsSummary {
+  totalGenerations: number;
+  totalCost: number;
+  avgCostPerDoc: number;
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  durationP50Ms: number;
+  durationP95Ms: number;
+  fallbackRate: number;
+  errorRate: number;
+  successCount: number;
+  errorCount: number;
+}
+
+export interface AiMetricsModelBreakdown {
+  modelId: string;
+  modelName: string;
+  providerName: string;
+  generations: number;
+  totalCost: number;
+  avgDurationMs: number;
+  totalInputTokens: number;
+  totalOutputTokens: number;
+}
+
+export interface AiMetricsPromptBreakdown {
+  promptId: string;
+  promptName: string;
+  promptVersion: string;
+  generations: number;
+  totalCost: number;
+  avgDurationMs: number;
+  successRate: number;
+}
+
+export interface AiMetricsDailyTrend {
+  date: string;
+  generations: number;
+  cost: number;
+  avgDurationMs: number;
+  errorCount: number;
+}
+
+export interface AiMetricsTopError {
+  message: string;
+  count: number;
+}
+
+export interface AiMetricsResponse {
+  period: string;
+  startDate: string;
+  endDate: string;
+  summary: AiMetricsSummary;
+  byModel: AiMetricsModelBreakdown[];
+  byPrompt: AiMetricsPromptBreakdown[];
+  dailyTrend: AiMetricsDailyTrend[];
+  topErrors: AiMetricsTopError[];
+}

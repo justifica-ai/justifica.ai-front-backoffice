@@ -41,6 +41,8 @@ import type {
   PlaygroundCompareResponse,
   PlaygroundTestDataResponse,
   PromptType,
+  AiMetricsResponse,
+  MetricsPeriod,
 } from '../models/ai.model';
 
 @Injectable({ providedIn: 'root' })
@@ -50,6 +52,7 @@ export class AdminAiService {
   private readonly modelsUrl = `${environment.apiUrl}/api/admin/ai/models`;
   private readonly promptsUrl = `${environment.apiUrl}/api/admin/ai/prompts`;
   private readonly playgroundUrl = `${environment.apiUrl}/api/admin/ai/playground`;
+  private readonly metricsUrl = `${environment.apiUrl}/api/admin/ai/metrics`;
 
   // ═══════ Providers ═══════
 
@@ -182,5 +185,12 @@ export class AdminAiService {
 
   getTestData(promptType: PromptType): Observable<PlaygroundTestDataResponse> {
     return this.http.get<PlaygroundTestDataResponse>(`${this.playgroundUrl}/test-data/${promptType}`);
+  }
+
+  // ═══════ Metrics ═══════
+
+  getMetrics(period: MetricsPeriod = '30d'): Observable<AiMetricsResponse> {
+    const params = new HttpParams().set('period', period);
+    return this.http.get<AiMetricsResponse>(this.metricsUrl, { params });
   }
 }
