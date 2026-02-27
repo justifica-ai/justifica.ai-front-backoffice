@@ -7,6 +7,7 @@ import { environment } from '../../../../../environments/environment';
 
 const providersUrl = `${environment.apiUrl}/api/admin/ai/providers`;
 const modelsUrl = `${environment.apiUrl}/api/admin/ai/models`;
+const promptsUrl = `${environment.apiUrl}/api/admin/ai/prompts`;
 
 describe('AiPageComponent', () => {
   let component: AiPageComponent;
@@ -43,6 +44,11 @@ describe('AiPageComponent', () => {
     provReq.flush({ data: [], pagination: { page: 1, limit: 100, total: 0, totalPages: 0 } });
     const modReq = httpTesting.expectOne((r) => r.url === modelsUrl);
     modReq.flush({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+  }
+
+  function flushPromptsList(): void {
+    const req = httpTesting.expectOne((r) => r.url === promptsUrl);
+    req.flush({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
   }
 
   it('should create', () => {
@@ -105,8 +111,39 @@ describe('AiPageComponent', () => {
 
     const el = fixture.nativeElement as HTMLElement;
     const buttons = el.querySelectorAll('nav button');
-    expect(buttons.length).toBe(2);
+    expect(buttons.length).toBe(3);
     expect(buttons[0].textContent).toContain('Provedores');
     expect(buttons[1].textContent).toContain('Modelos');
+    expect(buttons[2].textContent).toContain('Prompts');
+  });
+
+  it('should switch to prompts tab', () => {
+    fixture.detectChanges();
+    flushProvidersList();
+
+    component.activeTab.set('prompts');
+    fixture.detectChanges();
+    flushPromptsList();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('app-ai-prompts-page')).toBeTruthy();
+    expect(el.querySelector('app-ai-providers-page')).toBeFalsy();
+    expect(el.querySelector('app-ai-models-page')).toBeFalsy();
+  });
+
+  it('should switch from prompts to providers tab', () => {
+    fixture.detectChanges();
+    flushProvidersList();
+
+    component.activeTab.set('prompts');
+    fixture.detectChanges();
+    flushPromptsList();
+
+    component.activeTab.set('providers');
+    fixture.detectChanges();
+    flushProvidersList();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('app-ai-providers-page')).toBeTruthy();
   });
 });

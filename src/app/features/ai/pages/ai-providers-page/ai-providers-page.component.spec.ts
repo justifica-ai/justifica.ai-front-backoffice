@@ -333,6 +333,8 @@ describe('AiProvidersPageComponent', () => {
     const req = httpTesting.expectOne(`${baseUrl}/${provider.id}`);
     req.error(new ProgressEvent('error'), { status: 409, statusText: 'Conflict' });
     tick();
+
+    expect(component.providers().length).toBe(2);
   }));
 
   it('should not execute delete without target', fakeAsync(() => {

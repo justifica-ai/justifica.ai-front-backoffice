@@ -1,13 +1,14 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { AiProvidersPageComponent } from '../ai-providers-page/ai-providers-page.component';
 import { AiModelsPageComponent } from '../ai-models-page/ai-models-page.component';
+import { AiPromptsPageComponent } from '../ai-prompts-page/ai-prompts-page.component';
 
-type AiTab = 'providers' | 'models';
+type AiTab = 'providers' | 'models' | 'prompts';
 
 @Component({
   selector: 'app-ai-page',
   standalone: true,
-  imports: [AiProvidersPageComponent, AiModelsPageComponent],
+  imports: [AiProvidersPageComponent, AiModelsPageComponent, AiPromptsPageComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Inteligência Artificial</h1>
@@ -37,6 +38,17 @@ type AiTab = 'providers' | 'models';
         >
           Modelos
         </button>
+        <button
+          type="button"
+          (click)="activeTab.set('prompts')"
+          [class]="activeTab() === 'prompts'
+            ? 'pb-3 px-1 text-sm font-medium border-b-2 border-brand-600 text-brand-600 dark:text-brand-400 dark:border-brand-400'
+            : 'pb-3 px-1 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+          [attr.aria-selected]="activeTab() === 'prompts'"
+          role="tab"
+        >
+          Prompts
+        </button>
       </nav>
     </div>
 
@@ -47,6 +59,9 @@ type AiTab = 'providers' | 'models';
       }
       @case ('models') {
         <app-ai-models-page />
+      }
+      @case ('prompts') {
+        <app-ai-prompts-page />
       }
     }
   `,

@@ -22,6 +22,19 @@ import type {
   AdminAiModelDeleteResponse,
   AdminAiModelsReorderBody,
   AdminAiModelsReorderResponse,
+  AdminAiPromptsListResponse,
+  AdminAiPromptsListQuery,
+  AdminAiPromptDetail,
+  AdminAiPromptCreateBody,
+  AdminAiPromptCreateResponse,
+  AdminAiPromptUpdateBody,
+  AdminAiPromptUpdateResponse,
+  AdminAiPromptStatusBody,
+  AdminAiPromptStatusResponse,
+  AdminAiPromptCloneBody,
+  AdminAiPromptCloneResponse,
+  AdminAiPromptDiffResponse,
+  AdminAiPromptDeleteResponse,
 } from '../models/ai.model';
 
 @Injectable({ providedIn: 'root' })
@@ -29,6 +42,7 @@ export class AdminAiService {
   private readonly http = inject(HttpClient);
   private readonly providersUrl = `${environment.apiUrl}/api/admin/ai/providers`;
   private readonly modelsUrl = `${environment.apiUrl}/api/admin/ai/models`;
+  private readonly promptsUrl = `${environment.apiUrl}/api/admin/ai/prompts`;
 
   // ═══════ Providers ═══════
 
@@ -99,5 +113,53 @@ export class AdminAiService {
 
   reorderModels(body: AdminAiModelsReorderBody): Observable<AdminAiModelsReorderResponse> {
     return this.http.patch<AdminAiModelsReorderResponse>(`${this.modelsUrl}/reorder`, body);
+  }
+
+  // ═══════ Prompts ═══════
+
+  listPrompts(query: AdminAiPromptsListQuery): Observable<AdminAiPromptsListResponse> {
+    let params = new HttpParams()
+      .set('page', query.page.toString())
+      .set('limit', query.limit.toString());
+
+    if (query.type) {
+      params = params.set('type', query.type);
+    }
+    if (query.status) {
+      params = params.set('status', query.status);
+    }
+
+    return this.http.get<AdminAiPromptsListResponse>(this.promptsUrl, { params });
+  }
+
+  getPromptById(id: string): Observable<AdminAiPromptDetail> {
+    return this.http.get<AdminAiPromptDetail>(`${this.promptsUrl}/${id}`);
+  }
+
+  createPrompt(body: AdminAiPromptCreateBody): Observable<AdminAiPromptCreateResponse> {
+    return this.http.post<AdminAiPromptCreateResponse>(this.promptsUrl, body);
+  }
+
+  updatePrompt(id: string, body: AdminAiPromptUpdateBody): Observable<AdminAiPromptUpdateResponse> {
+    return this.http.patch<AdminAiPromptUpdateResponse>(`${this.promptsUrl}/${id}`, body);
+  }
+
+  changePromptStatus(id: string, body: AdminAiPromptStatusBody): Observable<AdminAiPromptStatusResponse> {
+    return this.http.patch<AdminAiPromptStatusResponse>(`${this.promptsUrl}/${id}/status`, body);
+  }
+
+  clonePrompt(id: string, body: AdminAiPromptCloneBody): Observable<AdminAiPromptCloneResponse> {
+    return this.http.post<AdminAiPromptCloneResponse>(`${this.promptsUrl}/${id}/clone`, body);
+  }
+
+  diffPrompts(versionA: string, versionB: string): Observable<AdminAiPromptDiffResponse> {
+    const params = new HttpParams()
+      .set('versionA', versionA)
+      .set('versionB', versionB);
+    return this.http.get<AdminAiPromptDiffResponse>(`${this.promptsUrl}/diff`, { params });
+  }
+
+  deletePrompt(id: string): Observable<AdminAiPromptDeleteResponse> {
+    return this.http.delete<AdminAiPromptDeleteResponse>(`${this.promptsUrl}/${id}`);
   }
 }

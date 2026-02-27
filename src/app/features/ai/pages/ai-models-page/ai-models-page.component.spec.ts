@@ -376,6 +376,8 @@ describe('AiModelsPageComponent', () => {
     const req = httpTesting.expectOne(`${modelsUrl}/${model.id}`);
     req.error(new ProgressEvent('error'), { status: 500, statusText: 'Error' });
     tick();
+
+    expect(component.models().length).toBe(2);
   }));
 
   it('should move priority up', fakeAsync(() => {
@@ -469,6 +471,8 @@ describe('AiModelsPageComponent', () => {
     const req = httpTesting.expectOne(`${modelsUrl}/${model.id}`);
     req.error(new ProgressEvent('error'), { status: 409, statusText: 'Conflict' });
     tick();
+
+    expect(component.models().length).toBe(2);
   }));
 
   it('should not execute delete without target', fakeAsync(() => {

@@ -10,6 +10,7 @@ describe('AdminAiService', () => {
 
   const providersUrl = `${environment.apiUrl}/api/admin/ai/providers`;
   const modelsUrl = `${environment.apiUrl}/api/admin/ai/models`;
+  const promptsUrl = `${environment.apiUrl}/api/admin/ai/prompts`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -211,6 +212,148 @@ describe('AdminAiService', () => {
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual(body);
       req.flush({ success: true, updated: 2 });
+    });
+  });
+
+  // ═══════ Prompts ═══════
+
+  describe('listPrompts', () => {
+    it('should list prompts with default params', () => {
+      service.listPrompts({ page: 1, limit: 20 }).subscribe();
+      const req = httpTesting.expectOne(
+        (r) => r.url === promptsUrl && r.params.get('page') === '1' && r.params.get('limit') === '20',
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+    });
+
+    it('should list prompts with type filter', () => {
+      service.listPrompts({ page: 1, limit: 20, type: 'defesa_previa' }).subscribe();
+      const req = httpTesting.expectOne(
+        (r) => r.url === promptsUrl && r.params.get('type') === 'defesa_previa',
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+    });
+
+    it('should list prompts with status filter', () => {
+      service.listPrompts({ page: 1, limit: 20, status: 'active' }).subscribe();
+      const req = httpTesting.expectOne(
+        (r) => r.url === promptsUrl && r.params.get('status') === 'active',
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+    });
+
+    it('should not send optional params when not provided', () => {
+      service.listPrompts({ page: 1, limit: 20 }).subscribe();
+      const req = httpTesting.expectOne(
+        (r) => r.url === promptsUrl && !r.params.has('type') && !r.params.has('status'),
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+    });
+  });
+
+  describe('getPromptById', () => {
+    it('should get prompt by id', () => {
+      const id = '770e8400-e29b-41d4-a716-446655440000';
+      service.getPromptById(id).subscribe();
+      const req = httpTesting.expectOne(`${promptsUrl}/${id}`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ id, name: 'Defesa Prévia v1' });
+    });
+  });
+
+  describe('createPrompt', () => {
+    it('should create prompt', () => {
+      const body = {
+        name: 'Test Prompt',
+        slug: 'test-prompt',
+        type: 'defesa_previa' as const,
+        version: '1.0.0',
+        systemPrompt: 'System prompt content',
+        userPromptTemplate: 'User template content',
+        temperature: 0.3,
+        maxTokens: 3000,
+        topP: 1.0,
+        frequencyPenalty: 0.3,
+        presencePenalty: 0.1,
+        description: null,
+      };
+      service.createPrompt(body).subscribe();
+      const req = httpTesting.expectOne(promptsUrl);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(body);
+      req.flush({ id: 'new-id', ...body, status: 'draft', isActive: false, createdAt: '2025-01-01T00:00:00.000Z' });
+    });
+  });
+
+  describe('updatePrompt', () => {
+    it('should update prompt', () => {
+      const id = '770e8400-e29b-41d4-a716-446655440000';
+      const body = { name: 'Updated Name' };
+      service.updatePrompt(id, body).subscribe();
+      const req = httpTesting.expectOne(`${promptsUrl}/${id}`);
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual(body);
+      req.flush({ id, name: 'Updated Name', slug: 'test', status: 'draft', version: '1.0.0', isActive: false, updatedAt: '2025-01-01T00:00:00.000Z' });
+    });
+  });
+
+  describe('changePromptStatus', () => {
+    it('should change prompt status', () => {
+      const id = '770e8400-e29b-41d4-a716-446655440000';
+      const body = { status: 'active' as const };
+      service.changePromptStatus(id, body).subscribe();
+      const req = httpTesting.expectOne(`${promptsUrl}/${id}/status`);
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual(body);
+      req.flush({ id, status: 'active', previousActiveId: null });
+    });
+  });
+
+  describe('clonePrompt', () => {
+    it('should clone prompt', () => {
+      const id = '770e8400-e29b-41d4-a716-446655440000';
+      const body = { newVersion: '2.0.0' };
+      service.clonePrompt(id, body).subscribe();
+      const req = httpTesting.expectOne(`${promptsUrl}/${id}/clone`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(body);
+      req.flush({ id: 'cloned-id', name: 'Cloned', slug: 'cloned-v200', type: 'defesa_previa', status: 'draft', version: '2.0.0', isActive: false, createdAt: '2025-01-01T00:00:00.000Z' });
+    });
+
+    it('should clone prompt with optional name', () => {
+      const id = '770e8400-e29b-41d4-a716-446655440000';
+      const body = { newVersion: '2.0.0', name: 'Custom Name' };
+      service.clonePrompt(id, body).subscribe();
+      const req = httpTesting.expectOne(`${promptsUrl}/${id}/clone`);
+      expect(req.request.body).toEqual(body);
+      req.flush({ id: 'cloned-id', name: 'Custom Name', slug: 'custom-name-v200', type: 'defesa_previa', status: 'draft', version: '2.0.0', isActive: false, createdAt: '2025-01-01T00:00:00.000Z' });
+    });
+  });
+
+  describe('diffPrompts', () => {
+    it('should diff two prompts', () => {
+      const idA = '770e8400-e29b-41d4-a716-446655440000';
+      const idB = '770e8400-e29b-41d4-a716-446655440001';
+      service.diffPrompts(idA, idB).subscribe();
+      const req = httpTesting.expectOne(
+        (r) => r.url === `${promptsUrl}/diff` && r.params.get('versionA') === idA && r.params.get('versionB') === idB,
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush({ promptA: { id: idA }, promptB: { id: idB } });
+    });
+  });
+
+  describe('deletePrompt', () => {
+    it('should delete prompt', () => {
+      const id = '770e8400-e29b-41d4-a716-446655440000';
+      service.deletePrompt(id).subscribe();
+      const req = httpTesting.expectOne(`${promptsUrl}/${id}`);
+      expect(req.request.method).toBe('DELETE');
+      req.flush({ success: true, id });
     });
   });
 });
